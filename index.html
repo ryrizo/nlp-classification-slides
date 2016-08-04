@@ -21,20 +21,146 @@
 
 class: center, middle
 
-# Title
+# Job Description Document Classification
+
+Ryan Perrizo
 
 ---
 
-# Agenda
+# Summary
 
-1. Introduction
-2. Deep-dive
-3. ...
+1. Introuction
+2. Data Retrieval
+3. Data Description
+4. Data Transformation
+5. Initial F1 Scores
+6. Model Selection
+7. Final Model
+8. Results
+9. Conclusion
 
 ---
 
 # Introduction
 
+* **Data source:** Indeed.com job descriptions
+
+* **ML Problem Type:** Supervised document classification
+
+* **Evaluation:** F1 score - Limit false negatives and false positives 
+
+* **Algorithms:** I focused on Multinomial Naive Bayes and Stochastic Gradient Descent
+
+---
+
+# Data Retrival
+
+* Scraped Indeed.com using publisher API
+  * Use query string and city name to scrape links
+  * Use python requests library and BeautifulSoup4 to scrape
+
+* Assigned labels based on query string
+  * labels = 'full stack developer', 'front end developer', 'human resources'
+
+* Took top results from 10 major cities
+
+---
+
+# Data Description
+
+* **Target:** Job Category 
+  * {full stack developer, front end developer, human resources}
+
+* **Features:** Job description text block
+
+* **Label Distribution:**
+  * Full stack developer - 4463 documents
+  * Front end developer - 5477 documents
+  * Human resources - 6701 documents
+  * Total - 16641 documents
+
+---
+
+# Data Transformation
+
+* **Cleaning:** 
+  * Lowercase
+  * Replace [^a-z0-9\s]+ with a space
+  * Split on whitespace
+  * Remove english stopwords and label words
+
+* **Stemmers**:
+  * PortStemmer
+  * SnowballStemmer
+  * No Stemmer None
+
+* **Text Featurization:**
+  * TFIDF with and without n-grams
+  * Bag-of-words with and without n-grams
+
+---
+
+# Initial Models F1 Score
+
+|   | - Full Stack -  | - Front End -  | - Human Resources -  |
+|---|:---:|:---:|:---:|
+|**SGD-BoW**   |.7506   |.7135   |.9821   |
+|**SGD-TFIDF**   |.7941   |.7370   |.9869   |
+|**MNB-BoW**   |.7125   |.6643   |.9734   |
+|**MNB-TFIDF**   |.7267   |.5019   |.9602   |
+
+---
+
+# Model Selection
+
+* Adjusted the following on initial models to compare results:
+  * N-grams
+  * Minimum document frequency
+  * Stemmers
+  * Stop-words
+  * Various params
+
+* Selected SGD-TFIDF for more granular parameter tuning with GridSearchCV
+
+---
+
+# Final Model
+
+* **Vectorizer:** TFIDF
+
+* **Algorithm:** Stochastic Gradient Descent Classifier
+
+* **N-gram range:** 1-2
+
+* **Penalty:** l1
+
+* **Loss:** hinge
+
+* **Minimum Document Frequency:** 5%
+
+* **Stemmer:** PortStemmer
+
+---
+
+# Results
+
+* F1 weighted score from 6 fold Cross Validation: .8564
+
+* Category F1 scores on test set:
+
+|   | - Full Stack -  | - Front End -  | - Human Resources -  |
+|---|:---:|:---:|:---:|
+|**Final**   |.8042   |.7577   |.9876   |
+|**Baseline**   |.7941   |.7370   |.9869   |
+
+---
+
+# Conclusion
+
+* Pseudo labels worked better than expected
+* Messy scraped data could be cleaned better
+* Multinomial Naive Bayes performed better with N-grams
+* Stochastic Gradient Descent 
     </textarea>
     <script src="remark-latest.min.js">
     </script>
